@@ -51,3 +51,6 @@
 [Depex]
    gEfiLoadedImageProtocolGuid
 
+[BuildOptions]
+	*_*_*_CC_FLAGS = -D DXE
+
