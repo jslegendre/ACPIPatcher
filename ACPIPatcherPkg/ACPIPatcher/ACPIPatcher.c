@@ -14,6 +14,11 @@ EFI_ACPI_SDT_HEADER                                 *gXsdt      = NULL;
 EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE           *gFacp      = NULL;
 UINT64                                              gXsdtEnd    = 0;
 
+#ifndef DXE
+#include <Library/PrintLib.h>
+#define MAX_PRINT_BUFFER (80 * 4)
+#endif
+
 VOID
 SelectivePrint (
  IN CONST CHAR16  *Format,
@@ -21,10 +26,16 @@ SelectivePrint (
  )
 {
 #ifndef DXE
+  UINTN   BufferSize  = (MAX_PRINT_BUFFER + 1) * sizeof(CHAR16);
+  CHAR16  *Buffer     = (CHAR16 *)AllocatePool(BufferSize);
+
   VA_LIST Marker;
-  VA_START (Marker, Format);
-  Print (Format, Marker);
-  VA_END (Marker);
+  VA_START(Marker, Format);
+  UnicodeVSPrint(Buffer, BufferSize, Format, Marker);
+  VA_END(Marker);
+  
+  gST->ConOut->OutputString(gST->ConOut, Buffer);
+  FreePool (Buffer);
 #endif
 }
 
