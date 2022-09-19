@@ -163,5 +163,12 @@ AcpiPatcherEntryPoint (
   } else {
     SelectivePrint(L"ACPI patching successful\n");
   }
+
+  gFacp->Header.Checksum = 0;
+  gFacp->Header.Checksum = CalculateCheckSum8((UINT8*)gFacp, gFacp->Header.Length);
+
+  gXsdt->Checksum = 0;
+  gXsdt->Checksum = CalculateCheckSum8((UINT8*)gXsdt, gXsdt->Length);
+
   return Status;
 }
