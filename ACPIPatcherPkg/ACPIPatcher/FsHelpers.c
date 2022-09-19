@@ -21,6 +21,7 @@
 #include <Guid/Gpt.h>
 
 #include "FsHelpers.h"
+EFI_LOADED_IMAGE_PROTOCOL           *gLoadedImage;
 
 /*++
  

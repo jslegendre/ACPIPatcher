@@ -12,8 +12,6 @@
 
 #include <Protocol/LoadedImage.h>
 
-EFI_LOADED_IMAGE_PROTOCOL           *gLoadedImage;
-
 /*++
  
  Routine Description:
