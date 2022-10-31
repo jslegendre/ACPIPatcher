@@ -11,7 +11,7 @@
 
 EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER        *gRsdp      = NULL;
 EFI_ACPI_SDT_HEADER                                 *gXsdt      = NULL;
-EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE           *gFacp      = NULL;
+EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE           *gFacp      = NULL;
 UINT64                                              gXsdtEnd    = 0;
 
 #ifndef DXE
@@ -80,8 +80,10 @@ PatchAcpi (
       }
       
       if(!StrnCmp(FileInfo->FileName, L"DSDT.aml", 9)) {
-          gFacp->Dsdt = (UINT32)FileBuffer;
+          gFacp->Dsdt = (UINT32)(UINTN)FileBuffer;
+          gFacp->XDsdt = (UINT64)FileBuffer;
           SelectivePrint(L"  New DSDT address: 0x%x\n", gFacp->Dsdt);
+          SelectivePrint(L"  New XDSDT address: 0x%llx\n", gFacp->XDsdt);
           continue;
       }
       
@@ -104,8 +106,8 @@ FindFacp()
   UINT64 *EntryPtr = (UINT64 *)(gXsdt + 1);
   for (UINTN Index = 0; Index < EntryCount; Index++, EntryPtr++) {
     Entry = (EFI_ACPI_SDT_HEADER *)((UINTN)(*EntryPtr));
-    if(Entry->Signature == EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE)
-      gFacp = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *)Entry;
+    if(Entry->Signature == EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE)
+      gFacp = (EFI_ACPI_6_4_FIXED_ACPI_DESCRIPTION_TABLE *)Entry;
   }
   
   return EFI_SUCCESS;
@@ -163,5 +165,12 @@ AcpiPatcherEntryPoint (
   } else {
     SelectivePrint(L"ACPI patching successful\n");
   }
+
+  gFacp->Header.Checksum = 0;
+  gFacp->Header.Checksum = CalculateCheckSum8((UINT8*)gFacp, gFacp->Header.Length);
+
+  gXsdt->Checksum = 0;
+  gXsdt->Checksum = CalculateCheckSum8((UINT8*)gXsdt, gXsdt->Length);
+
   return Status;
 }
