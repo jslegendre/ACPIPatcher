@@ -24,6 +24,18 @@ FS0:> ls ACPI/
 ## How to Build:
 Place `ACPIPatcherPkg` in your EDKII folder and build as usual. Prebuilt binaries are provided however. 
 `build -p ACPIPatcherPkg/ACPIPatcherPkg.dsc`
+On macOS with Xcode build as follows:
+```
+brew install nasm
+brew install mtoc
+git clone --depth=1 -b edk2-stable202202  https://github.com/tianocore/edk2.git && cd edk2/
+git submodule update --init --recommend-shallow
+. ./edksetup.sh
+make -C BaseTools
+build -a X64 -b RELEASE -t XCODE5 -p ACPIPatcherPkg/ACPIPatcherPkg.dsc
+build -a X64 -b DEBUG -t XCODE5 -p ACPIPatcherPkg/ACPIPatcherPkg.dsc
+```
+
 
 ### To Do:
 This is my first EFI application so I'm sure there is much work to be done here.  Things I can think of:
